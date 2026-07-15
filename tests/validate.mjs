@@ -33,7 +33,7 @@ for (const w of data.weeks) {
   check(w.sections.length >= 2, `Week ${w.n} needs at least 2 concept sections`);
   check(w.sections.every(s => s.id && s.title && s.paragraphs.length >= 2), `Week ${w.n} has an incomplete section`);
   check(w.lab?.steps?.length >= 4, `Week ${w.n} lab needs at least 4 steps`);
-  check(w.lab?.guidedSteps?.length === w.lab?.steps?.length, `Week ${w.n} needs guidance for every lab step`);
+  check(w.lab?.guidedSteps?.length >= w.lab?.steps?.length, `Week ${w.n} needs guidance for every lab step`);
   check(w.lab?.guidedSteps?.every(s => s.action && s.why && s.expected && s.troubleshoot), `Week ${w.n} guided lab needs action/reason/expected/troubleshooting`);
   check(w.lab?.recipe && ["studyCase","objects","command","outputs","holdPoint"].every(k=>w.lab.recipe[k]), `Week ${w.n} needs a complete PowerFactory execution sheet`);
   check(w.teacher?.foundation && w.teacher?.mentalModel && w.teacher?.mistakes?.length >= 3 && w.teacher?.workplace, `Week ${w.n} needs the complete teacher layer`);
@@ -50,6 +50,11 @@ for (const w of data.weeks) {
   for (const id of w.sources) check(sourceIds.has(id), `Week ${w.n} references unknown source ${id}`);
 }
 
+for (const n of [6,12,16,24,26]) {
+  const chapter = data.weeks.find(w => w.n === n);
+  check(chapter.lab.guidedSteps.length >= 12 && chapter.lab.guidedSteps.every(s => s.where), `Week ${n} needs a 12+ step field-executable PowerFactory procedure with exact object/command context`);
+}
+
 for (const file of ["index.html", "styles.css", "app.js", "data.js", "teacher-data.js", "mastery-data.js"]) check(fs.existsSync(path.join(root, file)), `Missing ${file}`);
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 for (const id of ["dashboardView", "curriculumView", "lessonView", "bootcampView", "toolsView", "glossaryView", "sourcesView", "cpdView", "tutorPanel", "termPopover", "tutorClear", "tutorDepth"]) check(html.includes(`id="${id}"`), `index.html missing #${id}`);
@@ -61,7 +66,10 @@ check(app.includes("I don’t have a reliable local answer"), "Tutor must have a
 check(app.includes("buildTutorCorpus") && app.includes("rankTutor") && app.includes("lastTopic"), "Tutor must use course retrieval and conversation context");
 check(app.includes("renderBootcamp") && app.includes("bindCalculators"), "Teacher bootcamp and calculators must be implemented");
 check(app.includes("renderMasteryPack") && app.includes("mastery-pack"), "Every week must render its definitions/formulas/example mastery pack");
-check(app.includes("renderMasteryChecks") && app.includes("Evidence gate"), "Every week must require six mastery evidence checks before completion");
+check(app.includes("Workplace quick card") && app.includes("Four-sentence engineering conclusion"), "Every chapter must end with a compact workplace application card");
+check(app.includes("Mark chapter read") && !app.includes("Evidence gate:"), "Reading progress must not be blocked by repetitive generic evidence forms");
+check(app.includes("renderChapterVisual") && app.includes("engineering-svg"), "Every chapter must render an accessible technical visual");
+check(fs.existsSync(path.join(root, "clipboard.png")), "The book cover image asset is missing");
 check(app.includes("pendingCalculation") && app.includes("lastDocs") && app.includes("lastIntent"), "Tutor must retain calculation and grounded conversation state");
 check(app.includes("Official source:") && app.includes("sourceIds"), "Tutor must expose source-backed citations when available");
 check(data.weeks.find(w=>w.n===30).mastery.code?.includes("GetActiveStudyCase"), "Week 30 needs a runnable PowerFactory Python pattern");
