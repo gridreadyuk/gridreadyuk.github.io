@@ -39,6 +39,9 @@ check(answer.citations.some(c=>c.url?.startsWith("https://")), "G99/G100 compari
 answer = tutor.ask("What is the formula and units for per-unit impedance?");
 check(answer.text.includes("formula and symbols") && answer.text.includes("Symbols, units, assumptions and traps"), "Formula intent should include the equation and its technical metadata");
 
+answer = tutor.ask("Why does a PV bus become a PQ bus at its reactive power limit?");
+check(answer.text.includes("Q is clamped") && answer.text.includes("voltage may move"), "Tutor should answer a causal PV-to-PQ limit question rather than returning only a reactive-power definition");
+
 answer = tutor.ask("Show every PowerFactory step for Week 12");
 check(answer.text.includes("PowerFactory:") && answer.text.includes("fault"), "Explicit Week 12 PowerFactory request should route to the Week 12 lab");
 
