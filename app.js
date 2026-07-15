@@ -110,58 +110,37 @@
 
   function renderDashboard() {
     const next = DATA.weeks.find(w => !isComplete(w.n)) || DATA.weeks[DATA.weeks.length - 1];
-    const hoursDone = DATA.weeks.filter(w => isComplete(w.n)).reduce((sum, w) => sum + w.hours, 0);
-    const totalHours = DATA.weeks.reduce((sum, w) => sum + w.hours, 0);
-    const recent = state.activity.length ? state.activity.slice(0, 4).map(a => `<div class="activity"><span class="activity-dot"></span><div><p>${esc(a.text).replace(/\bWeek\b/g, "Chapter")}</p><small>${formatDate(a.at)}</small></div></div>`).join("") : `<div class="activity"><span class="activity-dot"></span><div><p>Your learning activity will appear here.</p><small>Start Chapter 1 or resume your last chapter.</small></div></div>`;
     $("#dashboardView").innerHTML = `
-      <section class="hero">
-        <div>
-          <p class="eyebrow">A 32-chapter professional engineering book</p>
-          <h1>Learn the grid from first principles.</h1>
-          <p class="lead">Read in sequence from electrical foundations to professional PowerFactory studies, protection coordination and a defensible UK grid-connection evidence pack.</p>
+      <section class="hero book-cover">
+        <div class="cover-copy">
+          <p class="eyebrow">The Power Systems Engineer's Book</p>
+          <h1>From first principles to defensible GB grid studies.</h1>
+          <p class="lead">A practical, chapter-by-chapter guide to power-system studies, protection coordination, PowerFactory and GB connection engineering.</p>
+          <p class="cover-edition">Research baseline: 15 July 2026 · Grid Code Issue 6 Revision 42 · G99 Issue 2</p>
           <div class="hero-actions">
-            <button class="primary-button" ${state.completed.length ? `data-open-week="${next.n}"` : `data-go="bootcamp"`}>${state.completed.length ? "Continue reading" : "Read Foundation Zero"} ${icon("arrow")}</button>
+            <button class="primary-button" ${state.completed.length ? `data-open-week="${next.n}"` : `data-go="bootcamp"`}>${state.completed.length ? `Continue at Chapter ${next.n}` : "Begin with Foundation Zero"} ${icon("arrow")}</button>
             <button class="secondary-button" data-go="curriculum">Open the contents</button>
           </div>
         </div>
-        <div class="hero-stats" aria-label="Course summary">
-          <div class="hero-stat"><strong>32 chapters</strong><span>Intuition → equation → example → software → evidence</span></div>
-          <div class="hero-stat"><strong>${totalHours}+ hours</strong><span>Self-paced; one chapter per week is a sensible rhythm</span></div>
-          <div class="hero-stat"><strong>${DATA.glossaryItems.length} terms</strong><span>Hover, focus or tap for plain-English help</span></div>
-        </div>
+        <figure class="cover-art">
+          <img src="clipboard.png" alt="Illustrative view of a power-system engineer studying a network model, with a substation and renewable generation in the background.">
+          <figcaption>Illustrative cover artwork. Technical diagrams inside the book are authored SVGs.</figcaption>
+        </figure>
       </section>
-      <div class="jurisdiction-banner"><strong>Jurisdiction:</strong> Great Britain (England, Scotland and Wales). Northern Ireland uses SONI/NIE Networks arrangements and G98/NI/G99/NI; re-verify every live document and project agreement before professional use.</div>
-      <section class="metric-grid" aria-label="Your learning metrics">
-        ${metric("Book progress", `${progressPct()}%`, `${state.completed.length} of ${DATA.weeks.length} chapters`, "check")}
-        ${metric("Learning evidence", `${hoursDone} h`, "Estimated completed study", "time")}
-        ${metric("Bookmarks", state.bookmarks.length, "Saved chapters", "book")}
-        ${metric("Source baseline", "Jul 2026", `Grid Code Rev 42 · G99 Issue 2`, "shield")}
+      <div class="jurisdiction-banner"><strong>Scope:</strong> Great Britain (England, Scotland and Wales). Northern Ireland uses separate SONI/NIE Networks arrangements and G98/NI/G99/NI. For live work, re-check the current source, connection agreement and DNO/TO requirements.</div>
+      <section class="reading-method" aria-labelledby="reading-method-title">
+        <div><p class="eyebrow">How the book teaches</p><h2 id="reading-method-title">See it, calculate it, build it, defend it.</h2><p>Read in order the first time. Every chapter starts with a real engineering question and ends with a reusable workplace output.</p></div>
+        <ol><li><b>1</b><span><strong>See the system</strong>Read the SLD or graph and predict the physical direction.</span></li><li><b>2</b><span><strong>Own the method</strong>Learn definitions, assumptions, signs, units and equations.</span></li><li><b>3</b><span><strong>Reproduce it</strong>Follow the worked example and PowerFactory runbook.</span></li><li><b>4</b><span><strong>Make the decision</strong>Check the result and write a defensible conclusion.</span></li></ol>
       </section>
-      <section class="dashboard-grid">
-        <div class="panel">
-          <div class="panel-head"><h2>Parts of the book</h2><button class="text-button" data-go="curriculum">Open contents →</button></div>
-          <div class="phase-list">
-            ${DATA.phases.map((p, i) => {
-              const range = p.weeks.split("–").map(Number); const nums = DATA.weeks.filter(w => w.n >= range[0] && w.n <= range[1]);
-              const done = nums.filter(w => isComplete(w.n)).length;
-              return `<div class="phase-row"><span class="phase-number">${i + 1}</span><div><h3>${esc(p.name)}</h3><p>${esc(p.description)}</p></div><span>${done}/${nums.length} · Chapters ${esc(p.weeks)}</span></div>`;
-            }).join("")}
-          </div>
-        </div>
-        <div>
-          <div class="continue-card">
-            <span class="tag">Next recommended</span>
-            <h3>Chapter ${next.n}: ${esc(next.title)}</h3>
-            <p>${esc(next.summary)}</p>
-            <button class="secondary-button" data-open-week="${next.n}">Open chapter ${icon("arrow")}</button>
-          </div>
-          <div class="panel activity-panel">
-            <div class="panel-head"><h3>Recent activity</h3></div>
-            <div class="activity-list">${recent}</div>
-          </div>
-        </div>
+      <section class="book-toc-preview">
+        <div class="section-heading"><div><p class="eyebrow">Contents</p><h2>Six parts, one continuing engineering story</h2></div><button class="text-button" data-go="curriculum">View all 32 chapters →</button></div>
+        <div class="phase-list">${DATA.phases.map((p, i) => `<button class="phase-row book-part-link" type="button" data-phase="${esc(p.id)}"><span class="phase-number">${i + 1}</span><span><strong>${esc(p.name)}</strong><small>${esc(p.description)}</small></span><em>Chapters ${esc(p.weeks)}</em></button>`).join("")}</div>
+      </section>
+      <section class="next-reading">
+        <div><p class="eyebrow">Your next page</p><h2>Chapter ${next.n}: ${esc(next.title)}</h2><p>${esc(next.summary)}</p></div><button class="secondary-button" data-open-week="${next.n}">Open Chapter ${next.n} ${icon("arrow")}</button>
       </section>`;
     bindCommon($("#dashboardView"));
+    $$("[data-phase]", $("#dashboardView")).forEach(button => button.addEventListener("click", () => { curriculumFilter = button.dataset.phase; renderCurriculum(curriculumFilter); showView("curriculum"); }));
   }
   function metric(label, value, note, kind) {
     return `<div class="metric-card"><div class="metric-label"><span>${esc(label)}</span><span class="metric-icon">${icon(kind)}</span></div><strong>${esc(value)}</strong><small>${esc(note)}</small></div>`;
@@ -173,9 +152,9 @@
     if (filter === "bookmarks") list = list.filter(w => isBookmarked(w.n));
     else if (filter !== "all") list = list.filter(w => w.phase === filter);
     $("#curriculumView").innerHTML = `
-      <div class="page-heading"><div><p class="eyebrow">Table of contents</p><h1>The Power Systems Engineer's Book</h1><p>Read in order. Every chapter follows the same learning journey: intuition, precise definitions, equations, a worked example, a visual map, PowerFactory practice and workplace evidence.</p></div><span class="tag blue">${DATA.weeks.reduce((a,w)=>a+w.hours,0)} guided hours</span></div>
-      <section class="book-reading-key" aria-label="How every chapter teaches"><strong>How to use the book</strong><ol><li>Build the mental model.</li><li>Learn the exact language.</li><li>Derive and check the equations.</li><li>Follow the worked example.</li><li>Reproduce the PowerFactory study.</li><li>Explain and evidence the decision.</li></ol></section>
-      <article class="book-prologue"><span>Read before Chapter 1</span><div><h2>Prologue: Foundation Zero</h2><p>Units, algebra, trigonometry, complex numbers, RMS, phasors, KCL, KVL, R/L/C, three-phase power and the PowerFactory object hierarchy are taught here without assuming prior mastery.</p></div><button class="secondary-button" type="button" data-go="bootcamp">Open the foundation and lab manual →</button></article>
+      <div class="page-heading"><div><p class="eyebrow">Table of contents</p><h1>The Power Systems Engineer's Book</h1><p>Read the technical core in order. Chapters 30–31 are optional professional extensions; Chapter 32 integrates the full study package.</p></div></div>
+      <section class="book-reading-key" aria-label="How every chapter teaches"><strong>Question → picture → method → application</strong><ol><li>Predict before calculating.</li><li>Declare units and signs.</li><li>Follow the complete example.</li><li>Reproduce the field procedure.</li><li>Validate independently.</li><li>Write the decision and action.</li></ol></section>
+      <article class="book-prologue"><span>Front matter</span><div><h2>Foundation Zero</h2><p>0A mathematics and units · 0B circuits, phasors and three-phase quantities · 0C reading an SLD · 0D PowerFactory objects and the first benchmark model.</p></div><button class="secondary-button" type="button" data-go="bootcamp">Open Foundation Zero →</button></article>
       <div class="filter-bar" role="group" aria-label="Filter curriculum">
         ${filterButton("all", "All chapters", filter)}
         ${DATA.phases.map(p => filterButton(p.id, p.name, filter)).join("")}
@@ -199,7 +178,7 @@
     return `<article class="week-card ${isComplete(w.n) ? "is-complete" : ""}">
       <div class="week-top"><span class="week-index">Chapter ${w.n} · ${esc(phase.name)}</span><button class="bookmark-toggle ${isBookmarked(w.n) ? "is-bookmarked" : ""}" data-bookmark="${w.n}" aria-label="${isBookmarked(w.n) ? "Remove bookmark" : "Bookmark"} chapter ${w.n}">${isBookmarked(w.n) ? "♥" : "♡"}</button></div>
       <h2>${esc(w.title)}</h2><p>${esc(w.summary)}</p>
-      <div class="week-meta"><span>${w.hours} hours · ${esc(w.difficulty)}</span><span>${isComplete(w.n) ? "✓ Complete" : `${w.mastery?.formulas.length||0} formulas · worked example · lab`}</span></div>
+      <div class="week-meta"><span>${w.n === 30 || w.n === 31 ? "Optional professional extension" : "Technical core"}</span><span>${isComplete(w.n) ? "✓ Read" : `Figure · equations · example · PowerFactory`}</span></div>
       <button class="week-card-open" data-open-week="${w.n}" aria-label="Open Chapter ${w.n}: ${esc(w.title)}"></button>
     </article>`;
   }
@@ -219,15 +198,92 @@
   }
   function renderChapterJourney(w) {
     const stages = [
-      ["1", "Orient", "What question are we solving?", concise(w.summary), "teacher-start"],
-      ["2", "Understand", "Build the mental model", concise(w.teacher?.mentalModel || w.summary), "teacher-start"],
-      ["3", "Learn", "Read the physical mechanism", w.sections[0]?.title || "Core theory", w.sections[0]?.id || "mastery-pack"],
-      ["4", "Calculate", "Own the governing method", w.mastery?.formulas?.[0]?.title || "Engineering method", "mastery-pack"],
-      ["5", "Rehearse", "Follow a complete example", w.mastery?.example?.title || "Worked example", "mastery-pack"],
-      ["6", "Apply", "Reproduce it in PowerFactory", concise(w.lab?.title || "PowerFactory lab"), "powerfactory-lab"],
-      ["7", "Defend", "Turn the result into evidence", concise(w.teacher?.workplace || w.lab?.deliverable), "mastery-practice"]
+      ["1", "Question", "What decision must the study support?", "teacher-start"],
+      ["2", "Picture", "What should happen physically?", "system-visual"],
+      ["3", "Method", "Which equation, model and assumptions apply?", "mastery-pack"],
+      ["4", "Application", "Can you reproduce, check and report it?", "powerfactory-lab"]
     ];
-    return `<section class="chapter-journey" id="chapter-map"><div class="chapter-journey-head"><div><p class="eyebrow">The chapter map</p><h2>See the whole engineering story before reading the detail</h2></div><p>Follow the arrows once for understanding, then return to individual stages while solving the lab.</p></div><div class="journey-flow" role="list" aria-label="Seven-stage learning journey">${stages.map((s, i) => `<button type="button" class="journey-node" data-scroll-target="${esc(s[4])}" role="listitem"><span>${s[0]}</span><small>${esc(s[1])}</small><strong>${esc(s[2])}</strong><em>${esc(s[3])}</em>${i < stages.length - 1 ? `<b aria-hidden="true">→</b>` : ""}</button>`).join("")}</div></section>`;
+    return `<nav class="chapter-journey" id="chapter-map" aria-label="Chapter reading path"><ol>${stages.map(s => `<li><button type="button" data-scroll-target="${esc(s[3])}"><b>${s[0]}</b><span><strong>${esc(s[1])}</strong><small>${esc(s[2])}</small></span></button></li>`).join("")}</ol></nav>`;
+  }
+
+  function svgFrame(title, description, body) {
+    return `<svg class="engineering-svg" viewBox="0 0 900 360" role="img" aria-labelledby="chapter-figure-title chapter-figure-desc" preserveAspectRatio="xMidYMid meet"><title id="chapter-figure-title">${esc(title)}</title><desc id="chapter-figure-desc">${esc(description)}</desc>${body}</svg>`;
+  }
+  function foundationVisual() {
+    return svgFrame("Persistent training network single-line diagram", "An external grid feeds a 132 to 33 kilovolt transformer, 33 kilovolt cable, connection point and 33 to 11 kilovolt plant transformer. Arrows identify the declared positive flow direction and the model boundary.", `
+      <defs><marker id="arrow-sld" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" class="viz-fill"/></marker></defs>
+      <text x="26" y="34" class="viz-title">Continuing 132/33/11 kV training system</text><text x="26" y="57" class="viz-note">Ratings and states below are training data; replace them with controlled project data.</text>
+      <path d="M92 118V250M70 132H114M76 148H108M82 164H102" class="viz-line"/><text x="44" y="282" class="viz-label">External grid</text><text x="50" y="302" class="viz-note">132 kV</text>
+      <path d="M115 184H205" class="viz-line"/><circle cx="225" cy="184" r="24" class="viz-symbol"/><circle cx="263" cy="184" r="24" class="viz-symbol"/><path d="M287 184H374" class="viz-line"/><text x="195" y="232" class="viz-label">Grid transformer</text><text x="205" y="251" class="viz-note">132/33 kV</text>
+      <rect x="374" y="167" width="42" height="34" rx="4" class="viz-symbol"/><path d="M416 184H533" class="viz-line"/><text x="365" y="227" class="viz-label">33 kV CB</text><text x="444" y="164" class="viz-note">33 kV cable</text>
+      <path d="M533 126V245" class="viz-bus"/><circle cx="533" cy="184" r="7" class="viz-fill"/><text x="492" y="278" class="viz-label">Connection Point</text><text x="505" y="298" class="viz-note">study boundary</text>
+      <path d="M540 184H625" class="viz-line" marker-end="url(#arrow-sld)"/><text x="559" y="162" class="viz-note">+P, +Q declared</text><circle cx="652" cy="184" r="24" class="viz-symbol"/><circle cx="690" cy="184" r="24" class="viz-symbol"/><path d="M714 184H790" class="viz-line"/><rect x="790" y="154" width="74" height="60" rx="6" class="viz-symbol"/><text x="628" y="232" class="viz-label">Plant transformer</text><text x="648" y="251" class="viz-note">33/11 kV</text><text x="807" y="181" class="viz-label">PPM</text><text x="802" y="201" class="viz-note">BESS / plant</text>
+      <path d="M493 92H574V318H493Z" class="viz-boundary"/><text x="494" y="86" class="viz-accent">Connection and measurement boundary</text>`);
+  }
+  function steadyVisual() {
+    return svgFrame("Illustrative bus-voltage profile", "A line graph compares an intact case with an outage case from the external grid through the connection point to the plant bus. The outage profile is lower and must be compared with project-specific criteria.", `
+      <text x="30" y="34" class="viz-title">Voltage profile: intact versus outage case</text><text x="30" y="56" class="viz-note">Illustrative values only — use the controlled project criterion, not this shaded teaching band.</text>
+      <path d="M92 82V292H842M92 117H842M92 187H842M92 257H842" class="viz-grid"/><rect x="92" y="117" width="750" height="140" class="viz-band"/>
+      <text x="40" y="91" class="viz-note">1.075 pu</text><text x="48" y="123" class="viz-note">1.05</text><text x="48" y="193" class="viz-note">1.00</text><text x="48" y="263" class="viz-note">0.95</text><text x="53" y="299" class="viz-note">0.925</text>
+      <polyline points="110,166 290,174 470,182 650,194 820,205" class="viz-series-a"/><polyline points="110,180 290,194 470,215 650,246 820,274" class="viz-series-b"/>
+      ${[110,290,470,650,820].map((x,i)=>`<circle cx="${x}" cy="${[166,174,182,194,205][i]}" r="5" class="viz-point-a"/><circle cx="${x}" cy="${[180,194,215,246,274][i]}" r="5" class="viz-point-b"/>`).join("")}
+      <text x="95" y="325" class="viz-label">Grid</text><text x="257" y="325" class="viz-label">132 kV</text><text x="444" y="325" class="viz-label">33 kV</text><text x="619" y="325" class="viz-label">Connection Point</text><text x="790" y="325" class="viz-label">11 kV</text>
+      <path d="M565 32H610" class="viz-series-a"/><text x="620" y="37" class="viz-label">Intact</text><path d="M700 32H745" class="viz-series-b"/><text x="755" y="37" class="viz-label">Outage</text>`);
+  }
+  function faultVisual(protection) {
+    if (protection) return svgFrame("Illustrative protection time-current coordination", "A logarithmic-style plot shows a faster primary overcurrent curve, a slower backup curve, a transformer damage boundary, a load and inrush region and minimum-to-maximum fault current band.", `
+      <text x="30" y="34" class="viz-title">Protection coordination is a window, not one grading point</text><text x="30" y="56" class="viz-note">Illustrative characteristic. Use the exact relay model/manual, CT ratio, breaker time and project grading rule.</text>
+      <path d="M92 82V300H845" class="viz-line"/><text x="26" y="193" transform="rotate(-90 26 193)" class="viz-label">Operating time (s, log scale)</text><text x="420" y="344" class="viz-label">Primary current (A, log scale)</text>
+      <rect x="130" y="82" width="92" height="218" class="viz-load-zone"/><text x="135" y="105" class="viz-note">load + inrush</text><rect x="560" y="82" width="176" height="218" class="viz-fault-zone"/><text x="575" y="105" class="viz-note">min–max fault band</text>
+      <path d="M230 92C250 130 270 196 310 270L720 290" class="viz-series-a"/><path d="M260 80C288 118 315 176 355 235L760 263" class="viz-series-b"/><path d="M318 77C372 112 420 145 492 176L805 215" class="viz-limit"/>
+      <text x="590" y="286" class="viz-accent">Primary total time</text><text x="605" y="256" class="viz-blue">Backup total time</text><text x="615" y="205" class="viz-limit-label">equipment damage limit</text><path d="M650 256V286" class="viz-margin"/><text x="660" y="274" class="viz-note">margin</text>`);
+    return svgFrame("Fault contribution and sequence-path single-line diagram", "The external grid, plant and motor contribute to a fault at the connection point. A separate dashed earth-return path shows why transformer vector group, neutral and earthing data control earth-fault current.", `
+      <defs><marker id="arrow-fault" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" class="viz-fill"/></marker></defs>
+      <text x="30" y="34" class="viz-title">Fault current is a phasor sum at a declared boundary</text><text x="30" y="56" class="viz-note">Calculate each source contribution and prove the zero-sequence return path before interpreting earth faults.</text>
+      <rect x="45" y="133" width="130" height="66" rx="7" class="viz-symbol"/><text x="73" y="161" class="viz-label">External grid</text><text x="67" y="181" class="viz-note">source Z1, Z2, Z0</text><path d="M175 166H397" class="viz-line" marker-end="url(#arrow-fault)"/><text x="222" y="146" class="viz-accent">Igrid ∠θgrid</text>
+      <rect x="45" y="245" width="130" height="66" rx="7" class="viz-symbol"/><text x="84" y="274" class="viz-label">Motor</text><text x="67" y="294" class="viz-note">decaying contribution</text><path d="M175 278H385L420 199" class="viz-line" marker-end="url(#arrow-fault)"/>
+      <rect x="720" y="133" width="130" height="66" rx="7" class="viz-symbol"/><text x="760" y="161" class="viz-label">PPM</text><text x="737" y="181" class="viz-note">controlled current limit</text><path d="M720 166H495" class="viz-line" marker-end="url(#arrow-fault)"/><text x="570" y="146" class="viz-blue">Iconv ∠θconv</text>
+      <path d="M446 111V255" class="viz-bus"/><path d="M424 122L469 210M469 122L424 210" class="viz-fault"/><text x="407" y="96" class="viz-label">Fault at PoC</text><text x="379" y="278" class="viz-note">report RMS/peak/time quantity correctly</text>
+      <path d="M446 255V320H115V311" class="viz-earth"/><path d="M93 321H137M100 330H130M108 339H122" class="viz-earth"/><text x="202" y="313" class="viz-note">earth / neutral return path (Z0)</text>`);
+  }
+  function qualityVisual(dynamic) {
+    if (dynamic) return svgFrame("Illustrative RMS dynamic response", "A plot of connection-point voltage, active power and reactive power follows a disturbance. Event markers show fault start and clearance, and a dashed envelope represents a project-specific acceptance boundary.", `
+      <text x="30" y="34" class="viz-title">Dynamic evidence needs events, channels, limits and model revision</text><text x="30" y="56" class="viz-note">Conceptual RMS response — no regulatory envelope or compliance claim is implied.</text><path d="M86 82V300H850" class="viz-line"/><text x="418" y="342" class="viz-label">Time (s)</text>
+      <path d="M245 78V302M430 78V302" class="viz-event"/><text x="211" y="75" class="viz-note">fault applied</text><text x="402" y="75" class="viz-note">fault cleared</text>
+      <path d="M90 126H245L246 265L285 251L340 225L430 194L510 142L610 127H840" class="viz-series-a"/><path d="M90 188H245L260 225L320 242L430 223L500 192L650 185H840" class="viz-series-b"/><path d="M90 245H245L265 196L320 174L430 182L540 226L650 244H840" class="viz-limit"/>
+      <text x="755" y="119" class="viz-accent">V at PoC (pu)</text><text x="755" y="180" class="viz-blue">P (pu)</text><text x="755" y="238" class="viz-limit-label">Q (pu)</text>`);
+    return svgFrame("Harmonic spectrum and driving-point impedance", "A bar chart shows injected harmonic currents while an overlaid impedance curve peaks near one order. The fifth harmonic aligns with a high impedance and therefore creates a larger voltage contribution according to delta V h equals Z h times I h.", `
+      <text x="30" y="34" class="viz-title">Voltage distortion depends on both emission and network impedance</text><text x="30" y="56" class="viz-note">Illustrative spectrum and scan. Check individual orders, background and intact/outage impedance states.</text><path d="M88 82V300H850" class="viz-line"/><text x="410" y="342" class="viz-label">Harmonic order h</text><text x="20" y="200" transform="rotate(-90 20 200)" class="viz-label">Current / impedance, normalised</text>
+      ${[[1,120],[3,224],[5,155],[7,208],[11,246],[13,258]].map(([h,y])=>`<rect x="${90+h*48}" y="${y}" width="24" height="${300-y}" class="viz-bar"/><text x="${97+h*48}" y="322" class="viz-note">${h}</text>`).join("")}
+      <path d="M138 260C210 252 270 230 330 112C370 72 420 118 470 224C550 278 670 248 812 235" class="viz-series-b"/><circle cx="330" cy="112" r="6" class="viz-point-b"/><text x="342" y="103" class="viz-blue">impedance peak</text><text x="520" y="95" class="viz-accent">ΔVh = Zh Ih</text>`);
+  }
+  function codesVisual() {
+    return svgFrame("GB connection route and evidence chain", "A decision path separates potential G98 eligibility from G99 classification, then links the selected route to controlled requirements, model cases, results and DNO evidence. Ambiguous cases are escalated rather than guessed.", `
+      <text x="30" y="34" class="viz-title">Classify first; then trace every requirement to evidence</text><text x="30" y="56" class="viz-note">Headline learning map only. Aggregation, storage, shared systems and the offer can change the project route.</text>
+      <rect x="40" y="116" width="155" height="70" rx="8" class="viz-symbol"/><text x="74" y="145" class="viz-label">Plant boundary</text><text x="56" y="166" class="viz-note">IDC · RC · voltage · type test</text><path d="M195 151H270" class="viz-line"/>
+      <polygon points="270,151 350,100 430,151 350,202" class="viz-symbol"/><text x="313" y="146" class="viz-label">All G98</text><text x="310" y="165" class="viz-label">conditions?</text><path d="M350 100V74H520" class="viz-line"/><text x="377" y="91" class="viz-accent">yes</text><rect x="520" y="47" width="150" height="54" rx="7" class="viz-good"/><text x="565" y="78" class="viz-label">G98 route</text>
+      <path d="M350 202V245H520" class="viz-line"/><text x="365" y="230" class="viz-blue">no / uncertain</text><rect x="520" y="218" width="150" height="54" rx="7" class="viz-symbol"/><text x="546" y="249" class="viz-label">G99 A / B / C / D</text>
+      <path d="M670 74H733V245H670M733 160H790" class="viz-line"/><rect x="790" y="115" width="92" height="90" rx="7" class="viz-evidence"/><text x="807" y="141" class="viz-label">Evidence</text><text x="800" y="161" class="viz-note">source → model</text><text x="800" y="178" class="viz-note">case → result</text><text x="800" y="195" class="viz-note">status → action</text>
+      <text x="46" y="316" class="viz-note">Type B/C: follow the applicable DNO PGMD, commissioning and FON route. Type D: staged DNO EON → ION → FON/LON. Keep any NESO ONCP route separate.</text>`);
+  }
+  function capstoneVisual() {
+    return svgFrame("Engineering evidence traceability chain", "A left-to-right flow links a controlled requirement to assumptions and data, a versioned model, a named study case, a verified result and a decision with action. Feedback arrows show that failed or invalid evidence returns to the correct upstream stage.", `
+      <text x="30" y="34" class="viz-title">A result is useful only when its evidence chain is intact</text><text x="30" y="56" class="viz-note">Use the same chain for manual studies, scripts, reports and the capstone defence.</text>
+      ${[[35,"Requirement"],[175,"Data + assumptions"],[315,"Model revision"],[455,"Study case"],[595,"Checked result"],[735,"Decision + action"]].map(([x,label],i)=>`<rect x="${x}" y="125" width="125" height="76" rx="8" class="${i===5?"viz-good":"viz-symbol"}"/><text x="${x+62.5}" y="158" text-anchor="middle" class="viz-label">${label}</text><text x="${x+62.5}" y="181" text-anchor="middle" class="viz-note">ID · owner · status</text>${i<5?`<path d="M${x+125} 163H${x+140}" class="viz-line"/>`:""}`).join("")}
+      <path d="M797 220V278H238V220" class="viz-feedback"/><text x="380" y="303" class="viz-note">FAIL / INVALID / PENDING returns to the controlling input — never force a green result</text>`);
+  }
+  function renderChapterVisual(w) {
+    const visual = w.phase === "foundation" ? foundationVisual() : w.phase === "steady" ? steadyVisual() : w.phase === "fault" ? faultVisual(w.n >= 15) : w.phase === "quality" ? qualityVisual(w.n === 24) : w.phase === "codes" ? codesVisual() : capstoneVisual();
+    const caption = w.phase === "foundation" ? "This continuing network appears throughout the book so topology, ratings, boundaries and study evidence accumulate instead of restarting in every chapter." : "Read the labels first, predict the direction of change, then compare that prediction with the equations and PowerFactory result.";
+    const descriptions = {
+      foundation: "Follow the energised path from the 132 kV external grid through the grid transformer, 33 kV breaker and cable to the Connection Point, then through the plant transformer to the 11 kV power park module. The dashed box marks the connection and measurement boundary; positive P and Q direction must be declared.",
+      steady: "The intact and outage cases are plotted at the same five buses. Both profiles fall towards the plant; the outage case falls further. The shaded 0.95 to 1.05 pu teaching band is illustrative only and must be replaced by the project criterion.",
+      fault: w.n >= 15 ? "The plot places load and inrush at low current, a credible fault-current band at higher current, primary and backup total clearing curves, and an equipment-damage boundary. Coordination must be checked over the shared current range, including transitions and breaker time." : "External-grid, motor and converter contributions meet at the faulted Connection Point. They are phasors, so do not add magnitudes blindly. The dashed neutral and earth path represents zero-sequence continuity that must be proved before an earth-fault result is trusted.",
+      quality: w.n === 24 ? "The response plot marks fault application and clearance, then shows voltage, active power and reactive power recovering at different rates. A valid report also records controller limits, event definitions, model revision and the applicable acceptance envelope." : "The injected harmonic spectrum is shown beside the network driving-point impedance. An impedance peak near an injected order can magnify harmonic voltage because each order follows delta V h equals Z h times I h.",
+      codes: "The decision starts from the physical plant boundary, Intrinsic Design Capacity, Registered Capacity, connection voltage and type-test status. Only a case satisfying every current G98 condition follows G98; other or uncertain cases go to the applicable G99 route. Both paths end in traceable evidence, while ambiguous cases require DNO agreement.",
+      capstone: "A controlled requirement flows through owned data and assumptions, a versioned model, a named Study Case, a checked result and a decision with action. A failed, invalid or pending result returns to its controlling upstream stage instead of being hidden or forced to pass."
+    };
+    return `<section class="lesson-section chapter-visual" id="system-visual"><p class="eyebrow">See the system</p><h2>The physical picture before the calculation</h2><figure>${visual}<figcaption>${esc(caption)}</figcaption></figure><details class="visual-description"><summary>Read the diagram as text</summary><p>${esc(descriptions[w.phase])}</p></details></section>`;
   }
   function renderChapterNavigation(w) {
     const previous = weekFor(w.n - 1); const next = weekFor(w.n + 1);
@@ -244,26 +300,24 @@
             <div class="chapter-kicker"><p class="eyebrow">Part ${DATA.phases.findIndex(p => p.id === w.phase) + 1} · Chapter ${w.n} · ${esc(phase.name)}</p><button class="text-button focus-reading-button" type="button" data-focus-reading>Focus reading</button></div>
             <h1>${esc(w.title)}</h1>
             <p class="lead">${esc(w.summary)}</p>
-            <div class="lesson-meta"><span>${icon("time")} ${w.hours} guided hours</span><span>${icon("star")} ${esc(w.difficulty)}</span><span>${icon("book")} ${w.sections.length} concept sections</span><span>${icon("formula")} ${w.mastery?.formulas.length||0} formula/method cards</span><span>${icon("lab")} 1 PowerFactory runbook</span></div>
-            <div class="lesson-outcomes"><h3>After mastering this chapter, you can:</h3><ul>${w.outcomes.map(o => `<li>${renderRich(o)}</li>`).join("")}</ul></div>
+            ${w.n === 30 || w.n === 31 ? `<p class="optional-extension">Optional professional extension — complete the technical core first.</p>` : ""}
+            <div class="lesson-at-glance"><div><strong>Engineering question</strong><p>${renderRich(w.lab?.aim || w.summary)}</p></div><div><strong>Workplace output</strong><p>${renderRich(w.lab?.deliverable || w.teacher?.workplace)}</p></div></div>
+            <div class="lesson-outcomes"><h3>After this chapter you should be able to:</h3><ul>${w.outcomes.map(o => `<li>${renderRich(o)}</li>`).join("")}</ul></div>
           </header>
           ${renderChapterJourney(w)}
           ${renderTeacherStart(w)}
+          ${renderChapterVisual(w)}
           ${renderMasteryPack(w)}
           ${w.sections.map((s, i) => renderSection(s, i)).join("")}
           ${renderLab(w.lab)}
           ${renderMasteryPractice(w)}
-          ${renderMasteryChecks(w)}
           ${renderQuiz(w)}
-          <section class="lesson-section" id="sources"><h2>Source and version notes</h2><p>These sources govern the concepts and current UK context. For project work, open the live register and confirm document status, detailed clauses, connection agreement and DNO/TO policy.</p>
-            <div class="source-grid">${sourceCards.map(sourceMini).join("")}</div>
-          </section>
-          <section class="lesson-section"><h2>Chapter evidence checklist</h2><ul><li>Concepts explained in your own words, with symbols and units.</li><li>At least one independent hand/sensitivity check reconciled with PowerFactory.</li><li>Model, data, Study Case and source revisions recorded.</li><li>Assumptions, limitations and unresolved queries visible.</li><li>Deliverable peer-reviewed and CPD reflection logged.</li></ul></section>
+          <section class="lesson-section" id="sources"><details class="source-notes"><summary>References and version notes (${sourceCards.length})</summary><p>Open the live register before project use and confirm status, detailed clauses, connection agreement and DNO/TO policy.</p><ol>${sourceCards.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a> — ${esc(s.edition)}. <span>${esc(s.note)}</span></li>`).join("")}</ol></details></section>
           ${renderChapterNavigation(w)}
         </article>
         <aside class="lesson-aside">
-          <nav class="lesson-nav" aria-label="On this page"><strong>In this chapter</strong><a href="#chapter-map">Chapter map</a><a href="#teacher-start">Start with intuition</a><a href="#mastery-pack">Definitions, formulas & example</a>${w.sections.map((s,i) => `<a href="#${s.id}">${i+1}. ${esc(s.title)}</a>`).join("")}<a href="#powerfactory-lab">PowerFactory runbook</a><a href="#mastery-practice">Independent practice</a><a href="#mastery-checks">Six mastery checks</a><a href="#knowledge-check">Knowledge check</a><a href="#sources">Sources</a></nav>
-          <div class="lesson-progress-card"><strong>${isComplete(w.n) ? "Chapter complete" : "Evidence gate"}</strong><p class="text-muted">Complete six mastery records and answer both retrieval questions correctly before marking this chapter complete.</p><button class="primary-button complete-button ${isComplete(w.n) ? "is-complete" : ""}" data-complete="${w.n}">${isComplete(w.n) ? "✓ Completed — undo" : "Mark chapter complete"}</button></div>
+          <nav class="lesson-nav" aria-label="On this page"><strong>In this chapter</strong><a href="#teacher-start">Engineering question</a><a href="#system-visual">System picture</a><a href="#mastery-pack">Definitions, equations & example</a>${w.sections.map((s,i) => `<a href="#${s.id}">${i+1}. ${esc(s.title)}</a>`).join("")}<a href="#powerfactory-lab">PowerFactory field procedure</a><a href="#mastery-practice">Use it at work</a><a href="#knowledge-check">Check your understanding</a><a href="#sources">References</a></nav>
+          <div class="lesson-progress-card"><strong>${isComplete(w.n) ? "Chapter read" : "Reading progress"}</strong><p class="text-muted">Mark this chapter after you can explain the physical story and reproduce its main calculation. This is a reading aid, not professional authorisation.</p><button class="primary-button complete-button ${isComplete(w.n) ? "is-complete" : ""}" data-complete="${w.n}">${isComplete(w.n) ? "✓ Marked read — undo" : "Mark chapter read"}</button></div>
         </aside>
       </div>`;
     bindCommon($("#lessonView"));
@@ -277,7 +331,6 @@
     $("[data-complete]", $("#lessonView")).addEventListener("click", () => toggleComplete(w.n));
     bindQuiz(w);
     bindReadiness(w);
-    bindMasteryChecks(w);
     bindLabProgress(w);
     $$('[data-scroll-target]', $("#lessonView")).forEach(button => button.addEventListener("click", () => document.getElementById(button.dataset.scrollTarget)?.scrollIntoView({ behavior: "smooth", block: "start" })));
     $("[data-focus-reading]", $("#lessonView"))?.addEventListener("click", button => {
@@ -289,22 +342,23 @@
   function renderTeacherStart(w) {
     const t = w.teacher;
     if (!t) return "";
-    const previous = w.n > 1 ? `I can explain the main idea from Chapter ${w.n - 1}: ${weekFor(w.n - 1).title}.` : "I can use a calculator and rearrange simple equations.";
-    const ready = [previous, w.n > 1 ? "I have completed or reviewed the previous chapter’s evidence artifact." : "I can read voltage levels and connections on a simple single-line diagram.", String(t.foundation).replace(/\bWeek\b/g, "Chapter")];
-    return `<section class="lesson-section teacher-start" id="teacher-start"><p class="eyebrow">Teacher’s briefing</p><h2>Start with the physical story, then add the mathematics</h2>
-      <div class="mental-model"><h3>Big picture</h3><p>${renderRich(t.mentalModel)}</p></div>
-      <div class="teacher-grid"><div><h3>Readiness check</h3><p class="text-muted">Tick honestly. Unticked items are a signal to revise, not a failure.</p>${ready.map((item,i)=>`<label class="readiness-item"><input type="checkbox" data-ready="${w.n}-${i}" ${state.readiness[`${w.n}-${i}`] ? "checked" : ""}><span>${renderRich(item)}</span></label>`).join("")}</div>
-      <div><h3>Misconceptions to avoid</h3><ul>${t.mistakes.map(m=>`<li>${renderRich(m)}</li>`).join("")}</ul></div></div>
-      <div class="workplace-target"><strong>Workplace target</strong><p>${renderRich(t.workplace)}</p></div>
-      <button class="secondary-button" type="button" data-teach-week="${w.n}">Teach this chapter to me step by step</button></section>`;
+    return `<section class="lesson-section teacher-start" id="teacher-start"><p class="eyebrow">The engineering question</p><h2>Understand the cause-and-effect story first</h2>
+      <div class="mental-model"><h3>Physical story</h3><p>${renderRich(t.mentalModel)}</p></div>
+      <div class="teacher-grid"><div><h3>Knowledge to bring</h3><p>${renderRich(String(t.foundation).replace(/\bWeek\b/g, "Chapter"))}</p><p class="text-muted">If this is unfamiliar, use Foundation Zero or ask the tutor to teach the prerequisite before continuing.</p></div>
+      <div><h3>Wrong turns to recognise</h3><ul>${t.mistakes.map(m=>`<li>${renderRich(m)}</li>`).join("")}</ul></div></div>
+      <div class="workplace-target"><strong>Decision this chapter supports</strong><p>${renderRich(t.workplace)}</p></div>
+      <button class="secondary-button" type="button" data-teach-week="${w.n}">Teach this chapter step by step</button></section>`;
   }
   function renderMasteryPack(w) {
     const m=w.mastery;if(!m)return "";
     const definitions=m.definitions.map(name=>DATA.glossaryMap[name.toLowerCase()]||{term:name,short:"This term is introduced in the lesson below.",detail:"Use the lesson context and ask the tutor for the exact boundary and application."});
-    return `<section class="lesson-section mastery-pack" id="mastery-pack"><p class="eyebrow">Core chapter reading</p><h2>Language, equations and a complete worked example</h2><p class="mastery-reading">${renderRich(m.reading)}</p>
-      <div class="reading-instruction"><strong>Read this in three passes</strong><span>First read the plain meanings.</span><span>Then follow the equation with units.</span><span>Finally close the answer and reproduce the example yourself.</span></div>
-      <h3>Essential definitions</h3><p class="text-muted">The plain meaning is always visible. Open the professional detail when the idea is clear; it adds the boundary, convention and engineering precision.</p><div class="definition-grid">${definitions.map(d=>`<article class="definition-card"><h4>${esc(d.term)}${d.unit?` <small>${esc(d.unit)}</small>`:""}</h4><p class="definition-plain">${renderRich(d.short)}</p><details><summary>Professional definition and boundary</summary><p>${renderRich(d.detail)}</p>${d.aliases?`<span>Also called: ${esc(d.aliases)}</span>`:""}</details></article>`).join("")}</div>
-      <h3>Formula and method sheet</h3><p class="text-muted">An equation is safe only when its symbols, units, sign convention and application boundary travel with it.</p><div class="formula-grid">${m.formulas.map((f,i)=>`<article class="formula-card"><span class="formula-index">F${i+1}</span><h4>${esc(f.title)}</h4><div class="formula" aria-label="${esc(f.title)} equation">${esc(f.equation)}</div><div class="formula-reading"><span><b>1</b> Declare the known values and units.</span><span><b>2</b> Check the assumptions and sign convention.</span><span><b>3</b> Substitute without changing unit scale.</span><span><b>4</b> Sanity-check magnitude and physical direction.</span></div><dl><dt>Symbols and units</dt><dd>${renderRich(f.symbols)}</dd><dt>When it applies</dt><dd>${renderRich(f.assumptions)}</dd><dt>Common trap</dt><dd>${renderRich(f.trap)}</dd></dl></article>`).join("")}</div>
+    const coreDefinitions = definitions.slice(0, 6);
+    const supportingDefinitions = definitions.slice(6);
+    const definitionCard = d => `<article class="definition-card"><h4>${esc(d.term)}${d.unit?` <small>${esc(d.unit)}</small>`:""}</h4><p class="definition-plain">${renderRich(d.short)}</p><details><summary>Professional definition and boundary</summary><p>${renderRich(d.detail)}</p>${d.aliases?`<span>Also called: ${esc(d.aliases)}</span>`:""}</details></article>`;
+    return `<section class="lesson-section mastery-pack" id="mastery-pack"><p class="eyebrow">Build the engineering model</p><h2>Language, equations and a complete worked example</h2><p class="mastery-reading">${renderRich(m.reading)}</p>
+      <div class="reading-instruction"><strong>Use one disciplined method</strong><span>Predict the physical direction.</span><span>Declare values, units and signs.</span><span>Check assumptions.</span><span>Calculate and sanity-check.</span></div>
+      <h3>Essential definitions</h3><p class="text-muted">Read the plain meaning first. The professional detail adds the boundary, convention and engineering precision.</p><div class="definition-grid">${coreDefinitions.map(definitionCard).join("")}</div>${supportingDefinitions.length?`<details class="supporting-terms"><summary>${supportingDefinitions.length} supporting terms used in this chapter</summary><div class="definition-grid">${supportingDefinitions.map(definitionCard).join("")}</div></details>`:""}
+      <h3>Formula and method sheet</h3><p class="text-muted">An equation is safe only when its symbols, units, sign convention and application boundary travel with it.</p><div class="formula-grid">${m.formulas.map((f,i)=>`<article class="formula-card"><span class="formula-index">F${i+1}</span><h4>${esc(f.title)}</h4><div class="formula" aria-label="${esc(f.title)} equation">${esc(f.equation)}</div><dl><dt>Symbols and units</dt><dd>${renderRich(f.symbols)}</dd><dt>When it applies</dt><dd>${renderRich(f.assumptions)}</dd><dt>Common trap</dt><dd>${renderRich(f.trap)}</dd></dl></article>`).join("")}</div>
       <h3>Fully worked example</h3><article class="full-example"><header><span>Worked example</span><h4>${esc(m.example.title)}</h4></header><p class="example-problem"><strong>Problem:</strong> ${renderRich(m.example.problem)}</p><div class="worked-solution-steps">${m.example.steps.map((step,i)=>`<article><span>${i+1}</span><div><small>${i===0?"Set up":i===m.example.steps.length-1?"Check and conclude":"Calculate"}</small><p>${renderRich(step)}</p></div></article>`).join("")}</div><div class="example-answer"><strong>Answer</strong><p>${renderRich(m.example.answer)}</p></div><p><strong>Professional interpretation:</strong> ${renderRich(m.example.interpretation)}</p><details class="faded-practice"><summary>Now remove the scaffolding</summary><p>Change one stated input while keeping the same method. Before calculating, write the expected direction of change. Then solve, check units and explain any limit, discontinuity or non-linearity. This is the bridge from copying an example to engineering independently.</p></details></article>
       ${m.routeTable ? `<h3>Dated professional route map</h3><div class="route-table">${m.routeTable.map(row=>`<article><strong>${esc(row[0])}</strong><p>${renderRich(row[1])}</p></article>`).join("")}</div>` : ""}
       ${m.code ? `<h3>Runnable implementation pattern</h3><p class="text-muted">Read every assertion before adapting this to a controlled project. Object attributes and APIs can vary with PowerFactory version and model.</p><pre class="code-sample"><code>${esc(m.code)}</code></pre>` : ""}
@@ -316,7 +370,8 @@
   function renderLab(lab) {
     const steps = lab.guidedSteps || lab.steps.map(action => ({ action, why: "Required by the study method.", expected: "The intended state or result is visible.", troubleshoot: "Check case, data, units and calculation status." }));
     const r=lab.recipe;
-    return `<section class="lesson-section" id="powerfactory-lab"><p class="eyebrow">Applied practice</p><h2>PowerFactory runbook: prepare, perform, prove and record</h2><p>Do not use this as a list of clicks. At every step you must know why the object or option exists, what result should appear and which evidence makes the run reproducible.</p><div class="pf-version-note"><strong>Version boundary:</strong> Stable concepts and object/command classes are used below. Exact menu positions, library models, result-variable labels and licence modules can differ in PowerFactory 2025/2026. Use object Help and the installed User Manual/Technical References when a label differs; never guess an attribute.</div><div class="pf-lab"><span class="tag">Teacher-guided runbook</span><h3>${esc(lab.title)}</h3><p><strong>Engineering aim:</strong> ${renderRich(lab.aim)}</p>${r?`<div class="pf-recipe"><h4>Pre-flight sheet — complete before calculating</h4><div class="preflight-grid"><span><b>1. Active context</b>${renderRich(r.studyCase)}</span><span><b>2. Required model and data</b>${renderRich(r.objects)}</span><span><b>3. Calculation command</b>${renderRich(r.command)}</span><span><b>4. Results and evidence</b>${renderRich(r.outputs)}</span></div><div class="lab-hold-point"><strong>Stop/go criterion</strong><p>${renderRich(r.holdPoint)}</p></div></div>`:""}<div class="lab-method-legend" aria-label="Method used for every step"><span>Prepare</span><span>Perform</span><span>Verify</span><span>Record</span></div><div class="guided-steps">${steps.map((s,i) => `<article class="guided-step"><div class="guided-step-marker"><span class="step-number">${i+1}</span><label><input type="checkbox" data-lab-step="${currentWeek}-${i}" ${state.labProgress[`${currentWeek}-${i}`] ? "checked" : ""}><span>Recorded</span></label></div><div><p class="step-phase">Major step ${i+1} of ${steps.length}</p><h4>${renderRich(s.action)}</h4><div class="step-runbook"><section><strong>Before you act</strong><p>${renderRich(s.why)}</p></section><section><strong>Perform in PowerFactory</strong><p>${renderRich(s.action)}</p></section><section><strong>Verify the result</strong><p>${renderRich(s.expected)}</p></section><section><strong>If the result differs</strong><p>${renderRich(s.troubleshoot)}</p></section></div><p class="record-prompt"><strong>Record before continuing:</strong> active Study Case/scenario/variation, changed object or option, calculation status, expected-versus-observed result and the filename or table containing evidence.</p></div></article>`).join("")}</div><h4>Independent validation gates — do not skip</h4><ul>${lab.checks.map(c => `<li>${renderRich(c)}</li>`).join("")}</ul></div><div class="deliverable"><strong>Workplace deliverable:</strong> ${renderRich(lab.deliverable)}</div></section>`;
+    const locations = r ? [r.studyCase, r.objects, r.command, r.outputs] : [];
+    return `<section class="lesson-section" id="powerfactory-lab"><p class="eyebrow">Apply it in PowerFactory</p><h2>Field procedure: prepare, predict, execute, check and issue</h2><p>This procedure is organised around stable object and command concepts. Do not continue past an unexplained warning, invalid topology or physically impossible result.</p><div class="pf-version-note"><strong>PowerFactory version boundary:</strong> Written against stable concepts and object/command classes used in PowerFactory 2025/2026. Exact menus, result labels, relay libraries and available modules can differ. Use object Help and the installed User Manual/Technical References when a label differs; never guess an attribute or substitute a generic model for approved project evidence.</div><div class="pf-lab"><span class="tag">Engineering field procedure</span><h3>${esc(lab.title)}</h3><p><strong>Question:</strong> ${renderRich(lab.aim)}</p>${r?`<div class="pf-recipe"><h4>Preflight — write these items before opening the command</h4><div class="preflight-grid"><span><b>Active project context</b>${renderRich(r.studyCase)}</span><span><b>Controlled model and data</b>${renderRich(r.objects)}</span><span><b>Named calculation command</b>${renderRich(r.command)}</span><span><b>Results to retain</b>${renderRich(r.outputs)}</span></div><div class="prediction-box"><strong>Prediction before calculation</strong><p>Write the expected physical direction, approximate magnitude or controlling constraint. If you cannot predict anything, return to the SLD and worked example before running the model.</p></div><div class="lab-hold-point"><strong>Do not start until</strong><p>${renderRich(r.holdPoint)}</p></div></div>`:""}<div class="lab-method-legend" aria-label="Fields used for every runbook step"><span>Where</span><span>Action + why</span><span>Expected</span><span>Stop / fix</span><span>Record</span></div><div class="guided-steps">${steps.map((s,i) => `<article class="guided-step"><div class="guided-step-marker"><span class="step-number">${i+1}</span><label><input type="checkbox" data-lab-step="${currentWeek}-${i}" ${state.labProgress[`${currentWeek}-${i}`] ? "checked" : ""}><span>checked</span></label></div><div><p class="step-phase">Step ${i+1} of ${steps.length}</p><h4>${renderRich(s.action)}</h4><dl class="atomic-runbook"><dt>Where</dt><dd>${renderRich(s.where || locations[Math.min(i, locations.length-1)] || "Use the named Study Case, object and calculation command for this step.")}</dd><dt>Why</dt><dd>${renderRich(s.why)}</dd><dt>Expected evidence</dt><dd>${renderRich(s.expected)}</dd><dt>Stop / fix</dt><dd>${renderRich(s.troubleshoot)}</dd><dt>Record</dt><dd>Active Study Case, scenario, variation and study time; object or option changed; value and unit; calculation status; expected-versus-observed result; evidence filename.</dd></dl></div></article>`).join("")}</div><h4>Independent validation — do not skip</h4><ul>${lab.checks.map(c => `<li>${renderRich(c)}</li>`).join("")}</ul><div class="issue-gate"><h4>Ready to issue only when</h4><ul><li>The calculation completed without an unexplained warning or invalid case.</li><li>Signs, units, boundary and reported quantity match the study question.</li><li>One independent hand check or controlled sensitivity is reconciled through a declared error budget.</li><li>Inputs, source revisions, PowerFactory version, Study Case and model revision are recorded.</li><li>Any PASS, FAIL, INVALID, PENDING or AGREEMENT REQUIRED status is explicit.</li></ul></div></div><div class="deliverable"><strong>Workplace deliverable:</strong> ${renderRich(lab.deliverable)}</div></section>`;
   }
   function bindLabProgress(w) {
     $$(`[data-lab-step^="${w.n}-"]`, $("#lessonView")).forEach(input => input.addEventListener("change", () => {
@@ -327,12 +382,9 @@
   }
   function renderMasteryPractice(w) {
     const t = w.teacher;
-    return `<section class="lesson-section" id="mastery-practice"><p class="eyebrow">Apply without copying</p><h2>Your independent engineering practice</h2><div class="practice-grid">
-      <article><h3>1. Teach it back</h3><p>Without looking above, explain this mental model in your own words: ${renderRich(t?.mentalModel || w.summary)}</p></article>
-      <article><h3>2. Change one input</h3><p>Predict which outputs move, in which direction and why. Then change one controlled input in a copy of the Study Case and reconcile the result.</p></article>
-      <article><h3>3. Diagnose a bad result</h3><p>Introduce one listed misconception or lab failure deliberately. Record the symptom, physical reason, check that detects it and correction.</p></article>
-      <article><h3>4. Write the conclusion</h3><p>Write four sentences: question, controlling input/method, quantified result against criterion, and limitation/action. Avoid “looks okay”.</p></article>
-    </div><div class="mastery-rule"><strong>Mastery rule:</strong> answer both retrieval questions correctly, complete all six written evidence records and reproduce the lab after closing/reopening the project. If you cannot explain a result without the screen, revisit the mental model and hand check.</div></section>`;
+    return `<section class="lesson-section" id="mastery-practice"><p class="eyebrow">Use it at work</p><h2>Workplace quick card</h2><div class="workplace-card"><dl><dt>Question answered</dt><dd>${renderRich(w.lab?.aim || w.summary)}</dd><dt>Minimum data</dt><dd>Controlled SLD and boundary; equipment/network data with units, source, owner and revision; operating cases; applicable method and criterion.</dd><dt>Cases to run</dt><dd>Base case plus the maximum, minimum, outage, sensitivity or event cases that can change the decision.</dd><dt>Checks that must pass</dt><dd>${w.lab.checks.map(c=>renderRich(c)).join(" · ")}</dd><dt>Evidence to retain</dt><dd>Active context, command options, calculation status, tidy result table, one independent check, assumptions, limitations and exception log.</dd><dt>Deliverable</dt><dd>${renderRich(w.lab.deliverable)}</dd><dt>Stop and escalate when</dt><dd>The source or criterion is unclear; project data are missing; the model is unapproved; results are non-physical; software and hand checks differ beyond the declared error budget; or the conclusion needs protection, safety, DNO/TO or manufacturer agreement.</dd></dl></div>
+      <div class="conclusion-template"><h3>Four-sentence engineering conclusion</h3><ol><li><strong>Question:</strong> State the exact network, boundary, scenarios and decision.</li><li><strong>Method:</strong> State the controlling inputs, model/command and current criterion.</li><li><strong>Result:</strong> Give the worst quantified result, unit, case, limit and margin or explicit open status.</li><li><strong>Action:</strong> State the limitation, mitigation, agreement, review or next evidence required.</li></ol></div>
+      <details class="independent-practice"><summary>Independent practice before you call this job-ready</summary><ol><li>Explain the physical story without looking.</li><li>Rework the main calculation with changed data and predict the direction first.</li><li>Reproduce the PowerFactory study after reopening the project.</li><li>Introduce one bad input, identify its symptom and restore the baseline.</li><li>Ask a competent engineer to review the result and conclusion before professional issue.</li></ol></details></section>`;
   }
   function renderMasteryChecks(w) {
     const m = w.mastery;
@@ -382,16 +434,9 @@
 
   function toggleComplete(n) {
     const idx = state.completed.indexOf(n);
-    if (idx >= 0) { state.completed.splice(idx, 1); logActivity(`Reopened Chapter ${n}`); showToast("Chapter marked incomplete."); }
+    if (idx >= 0) { state.completed.splice(idx, 1); logActivity(`Reopened Chapter ${n}`); showToast("Chapter marked unread."); }
     else {
-      const checks = Array.from({length:6},(_,i)=>evidenceQuality(state.masteryEvidence[`${n}-${i}`]||"").pass).filter(Boolean).length;
-      const quizPasses = weekFor(n).quizzes.filter((_,i)=>state.quiz[`${n}-${i}`]?.correct).length;
-      if (checks < 6 || quizPasses < weekFor(n).quizzes.length) {
-        showToast(`Evidence gate: ${checks}/6 mastery checks and ${quizPasses}/${weekFor(n).quizzes.length} quiz answers complete.`);
-        document.getElementById(checks < 6 ? "mastery-checks" : "knowledge-check")?.scrollIntoView({behavior:"smooth"});
-        return;
-      }
-      state.completed.push(n); state.completed.sort((a,b)=>a-b); logActivity(`Completed Chapter ${n}: ${weekFor(n).title}`); showToast("Chapter complete — evidence gate passed and progress saved.");
+      state.completed.push(n); state.completed.sort((a,b)=>a-b); logActivity(`Read Chapter ${n}: ${weekFor(n).title}`); showToast("Chapter marked read. Reproduce the calculation and lab before treating it as job-ready.");
     }
     saveState(); renderLesson(weekFor(n));
   }
@@ -570,6 +615,8 @@
   function composeTutorAnswer(q) {
     const rawNormal=normaliseTutor(q);const pendingContinuation=Boolean(state.tutor.pendingCalculation)&&/^\s*[\d.]+\s*kv\s*$/.test(rawNormal);if(state.tutor.pendingCalculation&&!pendingContinuation&&!/\b(current|amp|calculate|compute)\b/.test(rawNormal))state.tutor.pendingCalculation=null;
     const intent=detectTutorIntent(q);if(pendingContinuation)intent.calculate=true;const expanded=followupQuery(q);
+    const pvLimitQuestion = /\b(pv|generator) bus\b/.test(rawNormal) && /\b(q\s*(?:max|min|limit)|reactive(?: power)? limit|voltage limit)\b/.test(rawNormal);
+    if (pvLimitQuestion) return {topic:"PV bus reactive limit",text:"Why a PV bus becomes PQ at a reactive-power limit\n\nA PV bus specifies active power P and voltage magnitude |V|. The load-flow solver adjusts reactive power Q and voltage angle to hold that voltage target.\n\nPhysical limit: the real generator or converter has finite Qmin/Qmax or current/capability limits. Once the calculated Q reaches the applicable limit, the plant cannot supply or absorb the extra reactive power needed to keep |V| fixed.\n\nModel transition: Q is clamped at the reached limit. P and Q are now specified, so the bus is solved as PQ and |V| becomes an output. The voltage may move away from its target; that movement is the physical result, not a convergence error.\n\nPowerFactory check: enable the verified Q limits and limit handling in the active ComLdf case; retain the generator Q, limit flag/status, bus voltage, controller target and slack Q. Check the sign convention before deciding whether Qmax or Qmin was reached.\n\nExample: if a generator must increase Q from 4 to 7 MVAr to hold 1.00 pu but Qmax is 5 MVAr, use Q = 5 MVAr and solve the bus voltage. Do not raise Qmax merely to make the target converge.",citations:[{label:"Open Chapter 6 — load-flow equations",week:6,anchor:"equations"},{label:"Open the Chapter 6 PowerFactory procedure",week:6,anchor:"powerfactory-lab"}],docs:["w-6-mastery","w-6-lab"]};
     if(intent.calculate){const calc=tutorCalculation(expanded);if(calc)return calc;}
     if(intent.compare){const terms=findCompareTerms(expanded);if(terms.length===2){const citations=[{label:`Find ${terms[0].term} in the glossary`,view:"glossary",query:terms[0].term},{label:`Find ${terms[1].term} in the glossary`,view:"glossary",query:terms[1].term}];const needles=terms.map(t=>normaliseTutor(t.term));DATA.sources.filter(s=>needles.some(n=>normaliseTutor(s.title).includes(n))).slice(0,2).forEach(s=>citations.push({label:`Official source: ${s.title}`,url:s.url}));return{topic:`${terms[0].term} versus ${terms[1].term}`,text:`${terms[0].term} versus ${terms[1].term}\n\n${terms[0].term}: ${terms[0].short} ${terms[0].detail}\n\n${terms[1].term}: ${terms[1].short} ${terms[1].detail}\n\nKey distinction: compare their definitions, applicability threshold or boundary, required evidence and consequence. Use the controlling current document before assigning a project route or result.`,citations,docs:[`g-${terms[0].term}`,`g-${terms[1].term}`]};}}
     const explicitWeek=expanded.match(/(?:week|chapter)\s*(\d{1,2})/i);const targetWeek=explicitWeek?weekFor(Number(explicitWeek[1])):((/this (?:week|chapter)/i.test(q)&&currentView==="lesson")?weekFor(currentWeek):null);
