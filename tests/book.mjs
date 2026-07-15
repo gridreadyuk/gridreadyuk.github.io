@@ -27,14 +27,16 @@ check(html.includes('id="termPopover" role="dialog"'), "Interactive term explana
 check(html.includes('id="tutorPanel" role="dialog"') && html.includes(" inert>"), "The closed tutor must be an inert dialog");
 check(app.includes("renderChapterJourney") && app.includes("renderChapterNavigation"), "Chapter map and previous/next navigation must render");
 check(app.includes("Chapter ${w.n}") && app.includes("#chapter-${w.n}"), "Public chapter labels and routes must be chapter based");
-check(app.includes("Prepare") && app.includes("Perform") && app.includes("Verify") && app.includes("Record"), "PowerFactory runbooks must use the four-stage execution cycle");
+check(app.includes("Where") && app.includes("Expected evidence") && app.includes("Stop / fix") && app.includes("Record"), "PowerFactory runbooks must expose location, action/reason, expected evidence, recovery and record fields");
 check(app.includes("data-lab-step") && app.includes("labProgress"), "Runbook checkpoints must persist locally");
 check(app.includes("Now remove the scaffolding") && app.includes("Pause and explain it without looking"), "Worked-example fading and retrieval pauses must be present");
 check(css.includes("prefers-reduced-motion") && css.includes(":focus-visible"), "Reduced-motion and visible-focus support must be present");
-check(css.includes(".journey-flow") && css.includes(".step-runbook"), "The chapter journey and runbook must have responsive visual layouts");
+check(css.includes(".engineering-svg") && css.includes(".atomic-runbook") && css.includes(".chapter-journey ol"), "The chapter figures, reading rail and field runbook must have responsive layouts");
 
 const guide = data.sources.find(source => source.id === "g9899-guide");
-check(guide?.edition.includes("Issue 3") && guide?.url.includes("EID=102117"), "The current G98/G99 Guide catalogue record must be used");
+check(guide?.edition.includes("Issue 3") && guide?.url.includes("EID=102789"), "The current G98/G99 Guide catalogue record must be used");
+check(!data.weeks[10].lab.checks.join(" ").includes("within 5%") && !data.weeks[11].lab.checks.join(" ").includes("within 5%"), "Fault-study reconciliation must use a declared error budget, not an arbitrary fixed percentage");
+check(fs.existsSync(path.join(root, "clipboard.png")), "The book cover image must be packaged for GitHub Pages");
 const apparent = data.glossaryMap["apparent power"];
 check(apparent?.short.includes("|S|") && apparent?.short.includes("S = P + jQ"), "Complex and apparent power notation must be distinct");
 const g99Text = data.weeks[24].sections.flatMap(section => section.paragraphs).join(" ");
@@ -46,4 +48,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`PASS: chapter book UX, ${data.weeks.length} chapter journeys, accessible term/tutor semantics, PowerFactory runbooks and current UK source corrections.`);
+console.log(`PASS: book-first chapter UX, ${data.weeks.length} chapter reading paths, accessible visuals/terms/tutor, field runbooks and current GB source corrections.`);
