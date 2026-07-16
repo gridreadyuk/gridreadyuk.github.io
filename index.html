@@ -6,6 +6,129 @@
   <meta name="description" content="A chapter-based UK power systems engineering book covering fundamentals, PowerFactory studies, protection coordination and grid connection practice.">
   <meta name="theme-color" content="#0b1220">
   <title>GridReady UK — The Power Systems Engineer's Book</title>
+  <link rel="stylesheet" href="styles.css?v=20260716-learning1">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M13 2 4.5 13h6L9.8 22 19.5 10h-6L13 2Z"/></svg>
+        </span>
+        <span><strong>GridReady</strong><small>UK engineering book</small></span>
+      </div>
+
+      <nav class="main-nav">
+        <p class="nav-group-label">Your route</p>
+        <button class="nav-item" data-view="start"><span aria-hidden="true">1</span><span>Start Here</span></button>
+        <button class="nav-item" data-view="paths"><span aria-hidden="true">→</span><span>Learning paths</span></button>
+        <button class="nav-item is-active" data-view="dashboard">
+          <span aria-hidden="true">⌂</span><span>Book home</span>
+        </button>
+        <button class="nav-item" data-view="curriculum">
+          <span aria-hidden="true">▤</span><span>Contents</span>
+        </button>
+        <button class="nav-item" data-view="bootcamp">
+          <span aria-hidden="true">⚡</span><span>Foundation Zero</span>
+        </button>
+        <button class="nav-item" data-view="project"><span aria-hidden="true">◇</span><span>Training project</span></button>
+        <button class="nav-item" data-view="capstone"><span aria-hidden="true">✦</span><span>Final project</span></button>
+        <p class="nav-group-label">Tools and reference</p>
+        <button class="nav-item" data-view="tools">
+          <span aria-hidden="true">∑</span><span>Worked calculators</span>
+        </button>
+        <button class="nav-item" data-view="glossary">
+          <span aria-hidden="true">Aa</span><span>Glossary</span>
+        </button>
+        <button class="nav-item" data-view="sources">
+          <span aria-hidden="true">↗</span><span>Source library</span>
+        </button>
+        <button class="nav-item" data-view="cpd">
+          <span aria-hidden="true">✓</span><span>Professional appendix</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="mini-progress">
+          <span><strong id="sideProgressValue">0%</strong> of the book complete</span>
+          <div class="progress-track" aria-hidden="true"><span id="sideProgressBar"></span></div>
+        </div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Switch colour theme">
+          <span class="theme-icon" aria-hidden="true">☼</span><span>Appearance</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="page">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="menuButton" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <div class="search-wrap">
+          <span aria-hidden="true">⌕</span>
+          <label class="sr-only" for="globalSearch">Search the book</label>
+          <input id="globalSearch" type="search" placeholder="Search chapters, equations, codes, protection…" autocomplete="off">
+          <kbd>/</kbd>
+          <div class="search-results" id="searchResults" hidden></div>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="bookmarkButton" aria-label="Show bookmarked chapters">♡</button>
+          <button class="tutor-launch" id="tutorLaunch"><span class="pulse-dot"></span>Ask the tutor</button>
+        </div>
+      </header>
+
+      <main id="main" tabindex="-1">
+        <section id="dashboardView" class="view is-active" data-view-panel="dashboard"></section>
+        <section id="startView" class="view" data-view-panel="start"></section>
+        <section id="pathsView" class="view" data-view-panel="paths"></section>
+        <section id="curriculumView" class="view" data-view-panel="curriculum"></section>
+        <section id="lessonView" class="view" data-view-panel="lesson"></section>
+        <section id="bootcampView" class="view" data-view-panel="bootcamp"></section>
+        <section id="projectView" class="view" data-view-panel="project"></section>
+        <section id="capstoneView" class="view" data-view-panel="capstone"></section>
+        <section id="toolsView" class="view" data-view-panel="tools"></section>
+        <section id="glossaryView" class="view" data-view-panel="glossary"></section>
+        <section id="sourcesView" class="view" data-view-panel="sources"></section>
+        <section id="cpdView" class="view" data-view-panel="cpd"></section>
+      </main>
+    </div>
+  </div>
+
+  <aside class="tutor-panel" id="tutorPanel" role="dialog" aria-modal="true" aria-label="Learning tutor" aria-hidden="true" inert>
+    <div class="tutor-head">
+      <div><span class="tutor-avatar" aria-hidden="true">∿</span><span><strong>Grid tutor</strong><small>Book-aware study assistant</small></span></div>
+      <div class="tutor-head-actions"><button class="text-button" id="tutorClear" type="button">Clear</button><button class="icon-button" id="tutorClose" aria-label="Close tutor">×</button></div>
+    </div>
+    <div class="tutor-context" id="tutorContext">Ask about a concept, equation, study result or UK requirement.</div>
+    <div class="tutor-mode"><label for="tutorDepth">Explanation depth</label><select id="tutorDepth"><option value="learner">Learner</option><option value="engineer">Engineer</option><option value="deep">Deep dive</option></select><span>History stays on this browser.</span></div>
+    <div class="tutor-messages" id="tutorMessages" aria-live="polite"></div>
+    <div class="suggested-prompts" id="suggestedPrompts"></div>
+    <form class="tutor-form" id="tutorForm">
+      <label class="sr-only" for="tutorInput">Ask a study question</label>
+      <textarea id="tutorInput" rows="2" placeholder="Ask a technical doubt…" required></textarea>
+      <button type="submit" aria-label="Send question">↑</button>
+    </form>
+    <p class="tutor-note">Private, local and no paid API. It retrieves and combines authored course material and remembers this conversation; it is not an unrestricted AI model. Confirm project settings with current codes, the DNO/TO and approved study brief.</p>
+  </aside>
+
+  <div class="popover" id="termPopover" role="dialog" aria-modal="false" aria-label="Term explanation" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="overlay" id="overlay" hidden></div>
+
+  <script src="data.js?v=20260716-learning1"></script>
+  <script src="teacher-data.js?v=20260716-learning1"></script>
+  <script src="mastery-data.js?v=20260716-learning1"></script>
+  <script src="learning-data.js?v=20260716-learning1"></script>
+  <script src="app.js?v=20260716-learning1"></script>
+</body>
+</html>
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A chapter-based UK power systems engineering book covering fundamentals, PowerFactory studies, protection coordination and grid connection practice.">
+  <meta name="theme-color" content="#0b1220">
+  <title>GridReady UK — The Power Systems Engineer's Book</title>
   <link rel="stylesheet" href="styles.css?v=20260715-book2">
 </head>
 <body>
