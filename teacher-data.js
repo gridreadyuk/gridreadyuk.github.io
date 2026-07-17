@@ -118,7 +118,7 @@
   ];
 
   for (const [id, title, publisher, edition, url, category, sourceNote] of pfSources) {
-    if (!D.sources.some(s => s.id === id)) D.sources.push({ id, title, publisher, edition, url, category, note: sourceNote, checked: D.checked });
+    if (!D.sources.some(s => s.id === id)) D.sources.push({ id, title, publisher, edition, url, category, note: sourceNote, checked: D.checked, classification: category === "Software" ? "Official software guidance" : category === "Connection guidance" ? "Official guidance" : category === "Protection / fault method" ? "Engineering recommendation" : category, status: "Verify live issue/version before project use", access: "Public", applicability: "Training reference only until checked against the applicable project boundary, agreement and controlled source.", published: edition });
   }
   [[12,"g74"],[13,"g74"],[23,"p29"],[25,"g98"],[25,"g99-forms"],[25,"g99-saf"],[26,"g99-forms"]].forEach(([week,id])=>{const w=D.weeks.find(item=>item.n===week);if(w&&!w.sources.includes(id))w.sources.push(id);});
 
