@@ -38,6 +38,40 @@ Then open `http://127.0.0.1:8765/`.
 
 All learner data—including tutor history—stays in browser `localStorage`. The tutor uses that history to keep the current topic and pending calculation context; it does not train a model on the conversation. Clearing site data or using **Clear** removes it. The tutor makes no API or network call and does not transmit questions anywhere.
 
+## Learner-development layer
+
+The book is now wrapped in a dependency-free engineering-development environment:
+
+- **Start Here** records a learner profile and objective, then uses a six-question diagnostic to recommend an advisory route.
+- Eight learning paths reuse the existing chapters rather than locking content. Each shows prerequisites, chapter sequence, effort, labs, assessments, portfolio evidence and a transparent completion standard.
+- The **Northmere Energy Park** continuing project is a fictional 132/33/11 kV training network with named assets, cases, assumptions and registers. It is deliberately not a proprietary PowerFactory project file or a real connection design.
+- The **Study Clinic** presents plausible model/study symptoms and a safe diagnostic order.
+- The **Final Project** has six milestones, 25 tracked deliverables, a self-review rubric and generic open-format (CSV/Markdown) templates.
+- Progress can be exported/imported as JSON. Imports are previewed before replacement; schema-1 records are migrated to schema 2 while preserving existing chapter, bookmark, lab, CPD, theme and tutor data.
+
+Reading progress and retained evidence are deliberately separate from competence. The site cannot judge a learner's PowerFactory model or professional conclusion; use controlled sources and competent review.
+
+## Content structure and maintenance
+
+Static browser scripts are loaded in this order:
+
+1. `data.js` — core chapters and controlled source register.
+2. `teacher-data.js` — field-executable PowerFactory teaching and labs.
+3. `mastery-data.js` — mastery packs, formulas and worked examples.
+4. `learning-data.js` — learner profiles, paths, diagnostic, continuing project, clinic, capstone and templates.
+5. `app.js` — rendering, local state migration, routing, tutor and interactions.
+
+To add a lesson, retain the chapter schema in `data.js` and its teacher/mastery enrichment. To add a lab, include the active context, controlled data, command, expected physical behaviour, independent validation, recovery route and retained evidence. To add a source, include its identifier, organisation, issue/revision, official URL, checked date, classification, status, access level and project-applicability note. To update a source review, recheck the primary register first; do not silently convert a guidance note or training assumption into a requirement.
+
+Maintenance checklist:
+
+- Check current source issues, live links and GB/NI applicability.
+- Recalculate changed worked examples and calculator expectations.
+- Review PowerFactory version-dependent labels against installed documentation.
+- Run the assessment, accessibility and responsive checks below.
+- Test import/migration before changing local-state schema.
+- Recheck capstone/template wording so it remains training-focused.
+
 ## GitHub Pages/static hosting
 
 This is a dependency-free static site published from the `gridreadyuk/gridreadyuk.github.io` repository. GitHub Pages serves it at `https://gridreadyuk.github.io/`. No serverless function, environment variable or paid API is needed. It can also be imported into any static host.
@@ -50,10 +84,12 @@ With Node.js available:
 node --check data.js
 node --check teacher-data.js
 node --check mastery-data.js
+node --check learning-data.js
 node --check app.js
 node tests/validate.mjs
 node tests/tutor.mjs
 node tests/book.mjs
+node tests/learning.mjs
 ```
 
 ## Engineering boundary
